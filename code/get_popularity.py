@@ -22,7 +22,7 @@ def get_popularity(artist_id):
 
 if __name__ == '__main__':
 
-    file = csv.reader(open('artist-uris.csv.csv', 'r', encoding='utf-8'), delimiter=',')
+    file = csv.reader(open('data/artist-uris.csv.csv', 'r', encoding='utf-8'), delimiter=',')
     artists = []
     threads = []
 
@@ -37,6 +37,6 @@ if __name__ == '__main__':
         artist_id, name, followers, genres, popularity = task.result()
         artists.append([name, artist_id, followers, genres, popularity])
 
-    with open("output.csv", "w", newline="", encoding="utf-8") as f:
+    with open("data/output.csv", "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerows(artists)

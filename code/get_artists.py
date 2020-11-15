@@ -37,13 +37,13 @@ if __name__ == '__main__':
     ids = []
     pandarallel.initialize()
 
-    df = pd.read_csv('songs.csv')
+    df = pd.read_csv('data/songs.csv')
 
-    artist_ids = [literal_eval(s) for s in df['artist_ids'].tolist()]
+    artist_ids = [literal_eval(s) for s in df['singer_ids'].tolist() + df['producer_ids'].tolist() + df['songwriter_ids'].tolist()]
     artist_ids = [item for sublist in artist_ids for item in sublist]
     artist_ids = set(artist_ids)
 
     df = pd.DataFrame(list(artist_ids), columns=['artist_id'])
 
     df = df.parallel_apply(search_genius, axis=1)
-    df.to_csv('artists.csv')
+    df.to_csv('data/artists.csv')
