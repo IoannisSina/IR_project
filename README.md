@@ -8,6 +8,8 @@ Currently, it's made use of:
 1. clear_spotify_dataset.py
 1. search_songs.py
 1. get_artists.py
+1. genre_splitter.py
+1. create_graphs.py
 
 ### Team
 Agisilaos Kounelis<br>
