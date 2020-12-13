@@ -8,7 +8,8 @@ import os
 
 def create_graph(filepath, figures_dir):
 
-    B = nx.Graph()
+    counter_zeros = 0
+    B = nx.DiGraph()
 
     with open(filepath) as csv_file:
         csv_reader = csv.DictReader(csv_file)
@@ -17,11 +18,12 @@ def create_graph(filepath, figures_dir):
         for row in csv_reader:
             line_count += 1
             if line_count > 0:
-                if row['singer_ids'] == '[]' or row['songwriter_ids'] == '[]':
+                if row['singer_ids'] in ['[]','0'] or row['songwriter_ids'] in ['[]','0']:
+                    counter_zeros += 1
                     continue
 
                 singers_list = literal_eval(row['singer_ids'])
-                songwriters_list = literal_eval(row['songwriter_ids'])genre_
+                songwriters_list = literal_eval(row['songwriter_ids'])
 
                 # Nodes
                 for singer_id in singers_list:
@@ -47,8 +49,8 @@ def create_graph(filepath, figures_dir):
     try:
         h,a = nx.hits(B)
         print(filepath)
-        print(h)
-        print(a)
+        print(sorted(h.items(), key=lambda x:x[1], reverse=True)[:50])
+        print(sorted(a.items(), key=lambda x:x[1], reverse=True)[:50])
     except Exception as e:
         print(filepath)
         print(e)
@@ -67,18 +69,29 @@ def create_graph(filepath, figures_dir):
             color_map.append('gray')
 
 
-    width_multiplier = .5
+    max_weight = -1
+    for (node1,node2,data) in B.edges(data=True):
+        max_weight = max(max_weight, data['weight'])
+
+    width_multiplier = 1/max_weight
     weights = [B[u][v]["weight"]*width_multiplier for u, v in B.edges() if u != v]
     nx.draw(B, width=weights, node_color=color_map, pos=nx.bipartite_layout(B, one_side_nodes), node_size=10) # with_labels = True
     plt.savefig(figures_dir + filepath.replace('songs/', '').replace('.csv', '') + '.png')
     plt.clf()
 
+    # print(counter_zeros)
+    # print(line_count)
+    # print(nx.is_directed(B))
+    # print(nx.density(B))
+    # print(nx.info(B))
 
 
 if __name__ == '__main__':
 
     results_dir = 'songs/'
     figures_dir = 'figures/'
+
+    # create_graph('songs/Pop.csv', figures_dir)
 
     for file in os.listdir(results_dir):
         filepath = os.path.join(results_dir, file)

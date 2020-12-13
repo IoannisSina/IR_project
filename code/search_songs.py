@@ -2,11 +2,12 @@ import requests
 import pandas as pd
 from pandarallel import pandarallel
 import API_keys
+import time
 
 api_search_url = 'https://api.genius.com/search?q='
 api_songs_url = 'https://api.genius.com/songs/'
 
-headers = {'Authorization': API_keys.genius_key }
+headers = { 'Authorization': API_keys.genius_key }
 
 def search_genius(x):
 
@@ -48,12 +49,12 @@ def search_genius(x):
                         break
             
             x['singer_ids'] = singer_ids
-            return x
+        else:
+            x['singer_ids'] = [result['primary_artist']['id'] if 'id' in result['primary_artist'] else None]
 
-        x['singer_ids'] = [result['primary_artist']['id'] if 'id' in result['primary_artist'] else None]
-
-    except requests.exceptions.RequestException as e:
-        # print(e)
+        print('OK')
+    except Exception as e:
+        print(e)
         pass
 
     return x
@@ -61,13 +62,15 @@ def search_genius(x):
 
 if __name__ == '__main__':
 
-    pandarallel.initialize()
+    pandarallel.initialize(nb_workers=32)
 
     df = pd.read_csv('data/dataset.csv')
     df = df.sort_values('popularity', ascending=False)
-    df = df.head(100)
 
+    start = time.time()
     df = df.parallel_apply(search_genius, axis=1)
+    end = time.time()
+    print(end - start)
 
     df = df.fillna(0)
     for collumn in ['annotation_count', 'genius_track_id', 'pyongs', 'pageviews', 'lyrics_owner_id']:
