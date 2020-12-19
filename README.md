@@ -9,6 +9,7 @@ Currently, it's made use of:
 1. search_songs.py
 1. genre_splitter.py
 1. create_graphs.py
+1. ground_truth.py
 
 ### Team
 Agisilaos Kounelis<br>
